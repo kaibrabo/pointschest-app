@@ -9,7 +9,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Dimensions,
   Modal,
   ScrollView,
   Linking,
@@ -23,7 +22,8 @@ import { CreditCard, UserProfile, Reward } from "../src/types";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import ProfileScreen from "../src/screens/ProfileScreen";
-import { useTheme } from "../src/theme";
+import { useTheme, ThemeColors } from "../src/theme";
+import { fetchCreditCardsFromApi } from "../src/api/cards";
 
 // Temporary user profile (in a real app, this would come from a backend)
 const initialUserProfile: UserProfile = {
@@ -66,8 +66,8 @@ export default function Index() {
   const [committedFavorites, setCommittedFavorites] = useState<string[]>([]);
   const [showProfile, setShowProfile] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CreditCard | null>(null);
+  const [cards, setCards] = useState<CreditCard[]>(creditCards);
   const searchInputRef = useRef<TextInput>(null);
-  const { height: screenHeight } = Dimensions.get("window");
 
   useEffect(() => {
     AsyncStorage.getItem("favoriteCards").then((stored) => {
@@ -84,12 +84,12 @@ export default function Index() {
     if (!showProfile) {
       setCommittedFavorites(userProfile.favoriteCards);
     }
-  }, [showProfile]);
+  }, [showProfile, userProfile.favoriteCards]);
 
   // Re-sort when search query changes
   useEffect(() => {
     setCommittedFavorites(userProfile.favoriteCards);
-  }, [searchQuery]);
+  }, [searchQuery, userProfile.favoriteCards]);
 
   useEffect(() => {
     const showEvent =
@@ -109,6 +109,23 @@ export default function Index() {
     return () => {
       keyboardShow.remove();
       keyboardHide.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchCreditCardsFromApi()
+      .then((apiCards) => {
+        if (!isMounted || !apiCards.length) return;
+        setCards(apiCards);
+      })
+      .catch((err) => {
+        console.warn("[cards] Falling back to bundled card data:", err.message);
+      });
+
+    return () => {
+      isMounted = false;
     };
   }, []);
 
@@ -173,7 +190,7 @@ export default function Index() {
 
   const sortedCards = useMemo(() => {
     if (!searchQuery) {
-      return [...creditCards].sort((a, b) => {
+      return [...cards].sort((a, b) => {
         const aIsFavorite = committedFavorites.includes(a.id);
         const bIsFavorite = committedFavorites.includes(b.id);
 
@@ -194,7 +211,7 @@ export default function Index() {
     const searchLower = searchQuery.toLowerCase();
 
     // Sort by reward rate and favorites for search results
-    return [...creditCards].sort((a, b) => {
+    return [...cards].sort((a, b) => {
       const rateA = getRewardRate(a, searchLower);
       const rateB = getRewardRate(b, searchLower);
       if (rateB !== rateA) {
@@ -208,7 +225,7 @@ export default function Index() {
       // If both/neither are favorites, sort by annual fee
       return b.annualFee - a.annualFee;
     });
-  }, [searchQuery, committedFavorites]);
+  }, [searchQuery, committedFavorites, cards]);
 
   const handleApply = (applicationLink: string) => {
     if (!applicationLink.startsWith("https://")) {
@@ -436,7 +453,7 @@ export default function Index() {
 
         {!!searchQuery && rewardRate > 0 && (
           <Text style={styles.matchedReward}>
-            {rewardRate}x points on "{searchQuery}"
+            {rewardRate}x points on &quot;{searchQuery}&quot;
           </Text>
         )}
 
@@ -498,6 +515,7 @@ export default function Index() {
       {showProfile ? (
         <ProfileScreen
           userProfile={userProfile}
+          cards={cards}
           onClose={() => setShowProfile(false)}
         />
       ) : (
@@ -653,8 +671,6 @@ export default function Index() {
     </SafeAreaView>
   );
 }
-
-import { ThemeColors } from "../src/theme";
 
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({

@@ -13,11 +13,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { UserProfile, CreditCard } from '../types';
-import { creditCards } from '../data/creditCards';
 import { useTheme, ThemeColors } from '../theme';
 
 interface ProfileScreenProps {
   userProfile: UserProfile;
+  cards: CreditCard[];
   onClose: () => void;
 }
 
@@ -40,11 +40,11 @@ const formatCardName = (name: string, cardType: string) => {
   return name;
 };
 
-export default function ProfileScreen({ userProfile, onClose }: ProfileScreenProps) {
+export default function ProfileScreen({ userProfile, cards, onClose }: ProfileScreenProps) {
   const { colors, theme, toggleTheme } = useTheme();
   const styles = makeStyles(colors);
   const [selectedCard, setSelectedCard] = useState<CreditCard | null>(null);
-  const walletCards = creditCards.filter(card =>
+  const walletCards = cards.filter(card =>
     userProfile.favoriteCards.includes(card.id)
   );
 
