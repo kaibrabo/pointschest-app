@@ -732,6 +732,7 @@ const makeStyles = (colors: ThemeColors) =>
       flex: 1,
       color: colors.textPrimary,
       fontSize: 15,
+      outlineStyle: "none",
     },
     header: {
       fontSize: 22,
@@ -793,6 +794,7 @@ const makeStyles = (colors: ThemeColors) =>
       color: colors.textPrimary,
       paddingVertical: 10,
       fontSize: 15,
+      outlineStyle: "none",
     },
     card: {
       backgroundColor: colors.surface,
