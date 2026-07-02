@@ -1,0 +1,162 @@
+# PointsChest - Design Document
+
+## Project Overview
+Purpose: Simple, fast credit card comparison and discovery app
+
+Description: PointsChest is a mobile app that helps users find the best credit card for their spending habits. Users browse a curated list of credit cards, search by category (dining, travel, gas, etc.) to find the highest reward rates, and tap "Apply Now" to go directly to the card issuer. Users can save favorite cards to a personal wallet and view their profile with a summary of their cards. Future phases will add user authentication, persistent storage, real-time card data, and a card recommendation engine.
+
+## Requirements
+
+### Technical Stack
+- React Native (Expo SDK ~52)
+- Expo Router (file-based routing)
+- TypeScript
+- Node.js / npm
+
+### Environment & Setup
+- No environment variables required (Phase 1 — static data)
+- No database setup (local state only)
+- No authentication setup (Phase 1)
+- No storage configuration (Phase 1)
+
+## Build Guidelines
+
+### Development Process
+1. Install dependencies: `npm install`
+2. Start dev server: `npx expo start`
+3. Run on iOS: `npx expo start --ios`
+4. Run on Android: `npx expo start --android`
+5. Run tests: `npm test`
+6. Lint: `npm run lint`
+
+### Folder Structure
+- `app/` — Expo Router screens (entry points)
+- `src/screens/` — Full screen components
+- `src/data/` — Static card data
+- `src/types/` — Shared TypeScript interfaces
+- `assets/` — Fonts and images
+
+### Error Handling & Logging
+- Validate URLs before calling Linking.openURL (https:// scheme only)
+- Handle empty/no-match search states gracefully
+- Guard against missing optional fields (welcomeBonus, imageUrl)
+
+## Features Required
+
+### Phase 1 (MVP) - Current
+a. Credit card list with search
+    1. [x] Display all credit cards in a scrollable list
+    2. [x] Search cards by spending category (dining, travel, gas, groceries, etc.)
+    3. [x] Sort results by highest reward rate for searched category
+    4. [x] Show card type badge (Travel, Cash Back, Business, Student, Secured)
+    5. [x] Show welcome bonus banner when available
+b. Card detail modal
+    1. [x] Full card details (rewards, APR, credit score, benefits)
+    2. [x] "Apply Now" button linking to card issuer website
+    3. [x] Favorite/unfavorite toggle (star icon)
+c. Favorites / Wallet
+    1. [x] Star cards to add to wallet
+    2. [x] Favorites float to top of card list
+    3. [x] Profile screen shows wallet cards with total annual fees
+    4. [ ] Persist favorites across app restarts (AsyncStorage)
+d. Profile screen
+    1. [x] Display user name, email, credit score
+    2. [x] Show wallet cards with annual fee summary
+    3. [x] Tap wallet card to view full details
+
+#### Testing
+- [ ] Test search results on iOS simulator
+- [ ] Test search results on Android emulator
+- [ ] Test "Apply Now" links open correctly
+- [ ] Validate keyboard behavior on both platforms
+- [ ] Deploy TestFlight build and validate on real device
+
+### Phase 2 (Auth & Persistence) - Future
+- [ ] User authentication (sign up, login, logout)
+- [ ] Persist favorites to user account (Supabase or Firebase)
+- [ ] Editable user profile (name, email, credit score, monthly spend)
+- [ ] Spending profile used to auto-rank best cards for the user
+- [ ] Push notifications for new card offers
+
+#### Implementation Steps
+1. [ ] Set up Supabase (or Firebase) project
+2. [ ] Add authentication (email/password or Google Sign-In)
+3. [ ] Create users table with profile fields
+4. [ ] Create favorites table linked to user accounts
+5. [ ] Replace local state with database-backed favorites
+6. [ ] Build editable profile screen
+7. [ ] Add spending inputs (dining, groceries, gas, travel, other $/month)
+8. [ ] Calculate best card per category based on user's actual spend
+9. [ ] Sort/rank cards by estimated annual value for the user
+10. [ ] Test full auth flow and data persistence
+
+### Phase 3 (Live Data & Recommendations) - Future
+- [ ] Real-time card data (APR, bonuses, benefits)
+- [ ] Card recommendation engine
+- [ ] Side-by-side card comparison
+- [ ] Notification for limited-time offers
+
+#### Implementation Steps
+1. [ ] Build or integrate card data API (scraping or partnership)
+2. [ ] Schedule periodic card data refresh
+3. [ ] Build recommendation algorithm (score cards by user spend profile)
+4. [ ] Add "Best for You" section at top of list
+5. [ ] Build comparison screen (select 2–3 cards, view side-by-side)
+6. [ ] Add push notification support for new/expiring welcome bonuses
+7. [ ] Test recommendation accuracy and data freshness
+
+### Phase 4 (Monetization) - Future
+- [ ] Affiliate tracking on "Apply Now" links
+- [ ] Featured card placements
+- [ ] Premium tier (advanced comparisons, custom alerts)
+
+#### Implementation Steps
+1. [ ] Register affiliate accounts with card issuers (Chase, Amex, etc.)
+2. [ ] Replace direct links with tracked affiliate URLs
+3. [ ] Add analytics to track clicks and conversions
+4. [ ] Build featured card slot (pinned above list)
+5. [ ] Create premium subscription tier
+6. [ ] Gate advanced features (full comparison, spend optimizer) behind premium
+7. [ ] Integrate payment processor (RevenueCat for in-app subscriptions)
+8. [ ] Test purchase flow and feature gating
+
+## App Store Launch Checklist
+
+### Pre-Submission
+- [ ] Add `ios.bundleIdentifier` to app.json (com.kaibrabo.creditcards)
+- [ ] Add `android.package` to app.json (com.kaibrabo.creditcards)
+- [ ] Replace placeholder icon and splash screen with real assets
+- [ ] Fix URL validation on all Linking.openURL calls
+- [ ] Persist favorites with AsyncStorage
+- [ ] Remove app-example/ folder
+- [ ] Delete unused google-services.json and GoogleService-Info.plist
+- [ ] Write and host Privacy Policy (required by both stores)
+- [ ] Add Privacy Policy link in app (profile screen or settings)
+
+### App Store (Apple)
+- [ ] Create app record in App Store Connect
+- [ ] Prepare screenshots (6.5" iPhone required, 12.9" iPad optional)
+- [ ] Write app store description and keywords
+- [ ] Set category: Finance
+- [ ] Submit for review (1–3 business days)
+
+### Google Play
+- [ ] Create app in Play Console
+- [ ] Upload AAB build
+- [ ] Fill in store listing, content rating
+- [ ] Submit for review (typically same-day)
+
+## Goals
+- Launch MVP (Phase 1) to App Store and Google Play
+- Validate user demand for card comparison tool
+- Generate affiliate revenue through "Apply Now" links
+- Build toward personalized recommendation engine
+
+## Notes
+- All card data is currently static in src/data/creditCards.ts — 30 cards total
+- Favorites are in-memory only (lost on app restart) until AsyncStorage is added
+- The app-example/ folder is Expo boilerplate and should be deleted before launch
+- google-services.json and GoogleService-Info.plist were generated but never integrated — delete them
+- "Apply Now" links go directly to card issuer sites — ensure https:// validation before opening
+- Card data accuracy: APR, bonuses, and benefits change frequently — add a "rates as of [date]" disclaimer
+- Android keyboard handling uses keyboardDidShow/Hide (not keyboardWillShow/Hide like iOS) — needs fix

@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "PointsChest",
+    "slug": "pointschest_415",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/black_chest_logo.png",
+    "scheme": "pointschest",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pointschest.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/black_chest_logo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.pointschest.app"
+    },
+    "web": {
+      "basePath": "/app",
+      "bundler": "metro",
+      "output": "single-page",
+      "favicon": "./assets/images/favicon.png",
+      "meta": {
+        "description": "Find the best credit cards for your spending habits and maximize your rewards points."
+      },
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/black_chest_logo.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "26fd5c90-afcd-433d-b872-cefbcb41e2a7"
+      }
+    },
+    "owner": "pointschest_415"
+  }
+}
